@@ -8,6 +8,8 @@ function Search() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [saved, setSaved] = useState(false);
+  const [interactions, setInteractions] = useState(null);
+  const [loadingInteractions, setLoadingInteractions] = useState(false);
 
   const handleSearch = async () => {
     if (!name) return;
@@ -15,11 +17,14 @@ function Search() {
     setError(null);
     setResult(null);
     setSaved(false);
+    setInteractions(null);
 
     try {
-      const res = await fetch(
-        `http://localhost:3000/medicines/${name}?lang=${lang}`,
-      );
+      const res = await fetch(`http://localhost:3000/medicines/search`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, lang }),
+      });
       const data = await res.json();
       if (data.error) throw new Error(data.error);
       setResult(data);
@@ -27,6 +32,21 @@ function Search() {
       setError("Medicine not found. Try a different name.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleInteractions = async () => {
+    setLoadingInteractions(true);
+    try {
+      const res = await fetch(
+        `http://localhost:3000/medicines/${name}/interactions?lang=${lang}`,
+      );
+      const data = await res.json();
+      setInteractions(data.interactions);
+    } catch (err) {
+      setError("Could not fetch interactions.");
+    } finally {
+      setLoadingInteractions(false);
     }
   };
 
@@ -88,7 +108,14 @@ function Search() {
       {error && <div className="error">{error}</div>}
 
       {result && (
-        <MedicineCard medicine={result} onSave={handleSave} saved={saved} />
+        <MedicineCard
+          medicine={result}
+          onSave={handleSave}
+          saved={saved}
+          onInteractions={handleInteractions}
+          interactions={interactions}
+          loadingInteractions={loadingInteractions}
+        />
       )}
     </div>
   );

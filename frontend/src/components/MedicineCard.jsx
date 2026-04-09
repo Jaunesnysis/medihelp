@@ -1,4 +1,12 @@
-function MedicineCard({ medicine, onSave, onDelete, saved }) {
+function MedicineCard({
+  medicine,
+  onSave,
+  onDelete,
+  saved,
+  onInteractions,
+  interactions,
+  loadingInteractions,
+}) {
   return (
     <div className="card">
       <div
@@ -56,6 +64,34 @@ function MedicineCard({ medicine, onSave, onDelete, saved }) {
             {medicine.warnings.map((w, i) => (
               <li key={i} className="text">
                 {w}
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+
+      {onInteractions && (
+        <button
+          className="btn-small"
+          onClick={onInteractions}
+          disabled={loadingInteractions}
+          style={{ marginTop: "10px", background: "#1a1a1a" }}
+        >
+          {loadingInteractions
+            ? "Kraunama..."
+            : "⚠ Sąveikos su kitais vaistais"}
+        </button>
+      )}
+
+      {interactions && (
+        <>
+          <div className="label" style={{ marginTop: "12px" }}>
+            Sąveikos
+          </div>
+          <ul style={{ paddingLeft: "1rem", marginTop: "4px" }}>
+            {interactions.map((i, idx) => (
+              <li key={idx} className="text" style={{ color: "#e53e3e" }}>
+                {i}
               </li>
             ))}
           </ul>
